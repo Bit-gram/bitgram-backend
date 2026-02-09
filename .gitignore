@@ -34,3 +34,15 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### General ###
+.env
+.env.*
+application-secret.yml
+src/main/resources/application-secret.yml
+
+### Docker & DB ###
+data/
+db/
+postgres_data/
+redis_data/
