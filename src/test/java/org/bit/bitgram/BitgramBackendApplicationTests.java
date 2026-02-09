@@ -1,4 +1,4 @@
-package org.bit.bitgrambackend;
+package org.bit.bitgram;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

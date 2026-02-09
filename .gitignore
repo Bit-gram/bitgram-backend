@@ -1,5 +1,8 @@
 HELP.md
 target/
+src/main/resources/application-local.yml
+src/main/resources/application-secret.yml
+*.log
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
