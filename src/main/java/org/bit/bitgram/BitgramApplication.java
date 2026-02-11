@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BitgramBackendApplication {
+public class BitgramApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BitgramBackendApplication.class, args);
+		SpringApplication.run(BitgramApplication.class, args);
 	}
 
 }
