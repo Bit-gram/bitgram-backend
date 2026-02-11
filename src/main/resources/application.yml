@@ -21,3 +21,5 @@ spring:
       hibernate:
         format_sql: true # SQL 예쁘게 출력
         dialect: org.hibernate.dialect.PostgreSQLDialect
+jwt:
+      header: Authorization
