@@ -1,5 +1,8 @@
 HELP.md
 target/
+src/main/resources/application-local.yml
+src/main/resources/application-secret.yml
+*.log
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -31,3 +34,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### General ###
+.env
+.env.*
+application-secret.yml
+src/main/resources/application-secret.yml
+init.sql
+
+### Docker & DB ###
+data/
+db/
+postgres_data/
+redis_data/
