@@ -5,7 +5,7 @@ reviews:
   high_level_summary: true # 요약글
   review_status: true
   collapse_walkthrough: false
-  auto_revview: # 자동 리뷰
+  auto_review: # 자동 리뷰
     enabled: true
     drafts: false
     base_branches:
