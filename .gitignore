@@ -40,6 +40,7 @@ build/
 .env.*
 application-secret.yml
 src/main/resources/application-secret.yml
+init.sql
 
 ### Docker & DB ###
 data/
