@@ -2,6 +2,7 @@ package org.bit.bitgram.global.exception;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.bit.bitgram.global.common.ApiResponse;
 import org.bit.bitgram.global.common.enums.ErrorCode;
 import org.hibernate.exception.ConstraintViolationException;
@@ -10,10 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException; // 정적 자원 없음 예외
 import org.springframework.web.servlet.ModelAndView; // 화면 전달용
 
@@ -48,7 +52,7 @@ public class GlobalExceptionHandler {
         List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> Map.of(
                         "field", error.getField(),
-                        "reason", error.getDefaultMessage()))
+                        "reason", error.getDefaultMessage() != null ? error.getDefaultMessage() : "유효하지 않은 값입니다."))
                 .toList();
 
         log.warn("DTO 필드 유효성 검증 실패: {}", errors);
@@ -59,31 +63,55 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 3, 4) 단일 파라미터 검증 실패(@RequestParam, @PathVariable 등)
+     * 3) 파라미터 타입 불일치 (ex: Long id에 "abc" 입력)
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        log.warn("파라미터 타입 불일치: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE));
+    }
+
+    /**
+     * 4) 필수 파라미터 누락 (@RequestParam)
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        log.warn("필수 파라미터 누락: {}", ex.getParameterName());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE));
+    }
+
+    /**
+     * 5) 바인딩 검증 실패
      */
     @ExceptionHandler({BindException.class, ConstraintViolationException.class})
     public ResponseEntity<ApiResponse<Void>> handleBindException(Exception ex) {
-        log.warn("단일 파라미터 값 바인딩/검증 실패: {}", ex.getMessage());
+        log.warn("단일 파라미터 값 바인딩 검증 실패: {}", ex.getMessage());
 
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE));
     }
 
-//    /**
-//     * 5) 지원하지 않는 HTTP 메서드 요청
-//     */
-//    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-//    public ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-//        log.warn("지원되지 않는 HTTP 메서드 요청: {}", ex.getMessage());
-//
-//        ApiResponse<Void> body = ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED);
-//        return new ResponseEntity<>(body, ErrorCode.METHOD_NOT_ALLOWED.getStatus());
-//    }
-//
+    /**
+     * 6) 지원하지 않는 HTTP 메서드 요청
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        log.warn("지원되지 않는 HTTP 메서드 요청: {}", ex.getMessage());
+
+        return ResponseEntity.
+                status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED));
+    }
 
     /**
-     * 6) JSON 파싱 오류 등 바디 형식이 잘못된 경우
+     * 7) JSON 파싱 오류 등 바디 형식이 잘못된 경우
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
@@ -95,7 +123,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 7) Spring Security 인가 예외 (권한 부족)
+     * 8) Spring Security 인가 예외 (권한 부족)
+     * -> 주의! FilterChain에서 발생하는 예외는 여기서 잡히지 않음
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException ex) {
@@ -106,7 +135,7 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ErrorCode.UNAUTHORIZED_ACCESS));
     }
 
-     /**
+    /**
      * React 라우팅 문제 해결:
      * static 리소스를 찾지 못했을 때(NoResourceFoundException),
      * API 요청이 아니라면 index.html로 돌려보낸다.
@@ -125,7 +154,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 8) 나머지 예외 처리 (서버 오류)
+     * 10) 나머지 예외 처리 (서버 오류)
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
