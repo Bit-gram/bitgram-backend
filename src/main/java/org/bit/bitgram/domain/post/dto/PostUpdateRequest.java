@@ -6,7 +6,7 @@ import org.bit.bitgram.domain.post.entity.PostStatus;
 
 @Getter
 @NoArgsConstructor
-public class PostCreateRequest {
+public class PostUpdateRequest {
     private String content;
     private String locationName;
     private PostStatus status;

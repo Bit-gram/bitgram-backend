@@ -61,6 +61,12 @@ public class Post extends ModifiedTimeEntity {
     }
 
     // 비즈니스 로직
+    public  void update(String content, String locationName, PostStatus status) {
+        this.content = content;
+        this.locationName = locationName;
+        this.status = status;
+    }
+
     public void softDelete() {
         this.status = PostStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
