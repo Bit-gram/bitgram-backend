@@ -74,6 +74,14 @@ public class PostService {
         return post.getId();
     }
 
+    // 게시물 삭제 (Soft Delete)
+    @Transactional
+    public void delete(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 없습니다. id=" + postId));
+        post.softDelete();
+    }
+
     private void savePostImage(List<MultipartFile> images, Post post) {
         for (int i = 0; i < images.size(); i++) {
             MultipartFile file = images.get(i);
