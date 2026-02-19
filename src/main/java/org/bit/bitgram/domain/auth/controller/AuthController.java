@@ -2,6 +2,7 @@ package org.bit.bitgram.domain.auth.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.bit.bitgram.domain.auth.dto.LoginRequest;
+import org.bit.bitgram.domain.auth.dto.ReissueRequest;
 import org.bit.bitgram.domain.auth.dto.SignupRequest;
 import org.bit.bitgram.domain.auth.dto.TokenResponse;
 import org.bit.bitgram.domain.auth.service.AuthService;
@@ -36,5 +37,10 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logout(Authentication authentication) {
         authService.logout(authentication.getName());
         return ResponseEntity.ok(ApiResponse.success());
+    }
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<TokenResponse>> reissue(@RequestBody ReissueRequest request) {
+        TokenResponse tokenResponse = authService.reissue(request.getEmail(), request.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success(tokenResponse));
     }
 }

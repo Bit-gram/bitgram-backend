@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.bit.bitgram.domain.auth.dto.LoginRequest;
 import org.bit.bitgram.domain.auth.dto.SignupRequest;
 import org.bit.bitgram.domain.auth.dto.TokenResponse;
+import org.bit.bitgram.global.common.enums.ErrorCode;
+import org.bit.bitgram.global.exception.BusinessException;
 import org.bit.bitgram.global.security.jwt.RefreshTokenService;
 import org.bit.bitgram.global.security.jwt.TokenProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +22,8 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final org.bit.bitgram.domain.user.repository.UserRepository userRepository;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
-
+    private final org.bit.bitgram.global.security.user.CustomUserDetailsService customUserDetailsService;
+    
     @Transactional
     public TokenResponse login(LoginRequest loginRequest) {
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -52,5 +55,25 @@ public class AuthService {
     @Transactional
     public void logout(String email) {
         refreshTokenService.deleteRefreshToken(email);
+    }
+    
+    @Transactional
+    public TokenResponse reissue(String email, String refreshToken) {
+    	if (!refreshTokenService.validateRefreshToken(email, refreshToken)) {
+            throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+    	org.springframework.security.core.userdetails.UserDetails userDetails = 
+                customUserDetailsService.loadUserByUsername(email);
+
+        org.springframework.security.authentication.UsernamePasswordAuthenticationToken authentication =
+                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+
+        String newAccessToken = tokenProvider.createToken(authentication);
+
+        return TokenResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken) 
+                .build();
     }
 }
