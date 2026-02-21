@@ -7,8 +7,11 @@ import org.bit.bitgram.domain.auth.dto.SignupRequest;
 import org.bit.bitgram.domain.auth.dto.TokenResponse;
 import org.bit.bitgram.domain.auth.service.AuthService;
 import org.bit.bitgram.global.common.ApiResponse;
+import org.bit.bitgram.global.security.user.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +45,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<TokenResponse>> reissue(@RequestBody ReissueRequest request) {
         TokenResponse tokenResponse = authService.reissue(request.getEmail(), request.getRefreshToken());
         return ResponseEntity.ok(ApiResponse.success(tokenResponse));
+    }
+    
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<CustomUserDetails>> getMyInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success(userDetails));
     }
 }
