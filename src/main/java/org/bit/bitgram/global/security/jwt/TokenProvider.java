@@ -6,6 +6,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.bit.bitgram.global.common.enums.ErrorCode;
 import org.bit.bitgram.global.exception.BusinessException;
+import org.bit.bitgram.global.security.user.CustomUserDetails;
+import org.bit.bitgram.global.security.user.CustomUserDetailsService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,12 +32,15 @@ public class TokenProvider implements InitializingBean {
     private final long tokenValidityInMilliseconds;
     private Key key;
     private final long refreshTokenValidityInMilliseconds = 7 * 24 * 60 * 60 * 1000L;
+    private final CustomUserDetailsService customUserDetailsService;
 
     public TokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
+            CustomUserDetailsService customUserDetailsService) {
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.customUserDetailsService = customUserDetailsService;
     }
     
     public String createRefreshToken(Authentication authentication) {
@@ -78,15 +83,17 @@ public class TokenProvider implements InitializingBean {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+        
+        String email = claims.getSubject();
 
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
+        
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
 
-        User principal = new User(claims.getSubject(), "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
     }
 
     public boolean validateToken(String token) {
