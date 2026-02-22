@@ -1,10 +1,38 @@
 spring:
   config:
-    import: optional:classpath:application-secret.yml
+    import: "optional:classpath:application-secret.yml"
   profiles:
     active: local
   application:
     name: bitgram-backend
+  
+  security:
+    oauth2:
+      client:
+        registration: 
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
+            client-name: Kakao
+            scope:
+              - account_email
+              - profile_nickname
+
+        provider: 
+            kakao:
+               authorization-uri: https://kauth.kakao.com/oauth/authorize
+               token-uri: https://kauth.kakao.com/oauth/token
+               user-info-uri: https://kapi.kakao.com/v2/user/me
+               user-name-attribute: id
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_HOST:localhost}:5431/bitgram
@@ -15,9 +43,12 @@ spring:
       port: 6379
   jpa:
     hibernate:
-      ddl-auto: update # 변경된 부분만 DB에 반영
-    show-sql: true # 실행되는 SQL 눈으로 확인
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        format_sql: true # SQL 예쁘게 출력
+        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  header: Authorization
