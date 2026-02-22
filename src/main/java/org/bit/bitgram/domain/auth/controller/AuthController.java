@@ -1,12 +1,15 @@
 package org.bit.bitgram.domain.auth.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import org.bit.bitgram.domain.auth.dto.AuthUserInfo;
 import org.bit.bitgram.domain.auth.dto.LoginRequest;
 import org.bit.bitgram.domain.auth.dto.ReissueRequest;
 import org.bit.bitgram.domain.auth.dto.SignupRequest;
 import org.bit.bitgram.domain.auth.dto.TokenResponse;
 import org.bit.bitgram.domain.auth.service.AuthService;
 import org.bit.bitgram.global.common.ApiResponse;
+import org.bit.bitgram.global.common.enums.ErrorCode;
 import org.bit.bitgram.global.security.user.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,8 +51,18 @@ public class AuthController {
     }
     
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<CustomUserDetails>> getMyInfo(
+    public ResponseEntity<ApiResponse<AuthUserInfo>> getMyInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success(userDetails));
+        if (userDetails == null) {
+        	return ResponseEntity.status(401).body(ApiResponse.error(ErrorCode.UNAUTHORIZED_ACCESS));
+        }
+
+        AuthUserInfo userInfo = AuthUserInfo.builder()
+                .email(userDetails.getUser().getEmail())
+                .nickname(userDetails.getUser().getNickname())
+                .profileImageUrl(userDetails.getUser().getProfileImageUrl())
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.success(userInfo)); 
     }
 }

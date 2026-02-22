@@ -1,10 +1,16 @@
 package org.bit.bitgram.domain.auth.dto;
-import org.bit.bitgram.domain.user.entity.AuthProvider;
 
-public interface AuthUserInfo {
-    String getProviderId();
-    AuthProvider getProvider();
-    String getEmail();
-    String getNickname();
-    String getProfileImageUrl();
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthUserInfo { 
+    private String email;
+    private String nickname;
+    private String profileImageUrl;
 }

@@ -29,12 +29,24 @@ public class TokenProvider implements InitializingBean {
     private final String secret;
     private final long tokenValidityInMilliseconds;
     private Key key;
+    private final long refreshTokenValidityInMilliseconds = 7 * 24 * 60 * 60 * 1000L;
 
     public TokenProvider(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+    }
+    
+    public String createRefreshToken(Authentication authentication) {
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .subject(authentication.getName())
+                .signWith(key)
+                .expiration(validity)
+                .compact();
     }
 
     @Override

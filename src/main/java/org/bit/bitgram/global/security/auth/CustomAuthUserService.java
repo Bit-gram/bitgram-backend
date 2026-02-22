@@ -1,9 +1,9 @@
 package org.bit.bitgram.global.security.auth;
 
 import lombok.RequiredArgsConstructor;
-import org.bit.bitgram.domain.auth.dto.AuthUserInfo; 
 import org.bit.bitgram.domain.auth.dto.GoogleUserInfo; 
 import org.bit.bitgram.domain.auth.dto.KakaoUserInfo;
+import org.bit.bitgram.domain.auth.dto.OAuth2UserInfo;
 import org.bit.bitgram.domain.user.entity.User;
 import org.bit.bitgram.domain.user.entity.Role;
 import org.bit.bitgram.domain.user.repository.UserRepository;
@@ -28,7 +28,7 @@ public class CustomAuthUserService extends DefaultOAuth2UserService {
         
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         
-        AuthUserInfo userInfo = switch (registrationId) {
+        OAuth2UserInfo userInfo = switch (registrationId) {
             case "google" -> new GoogleUserInfo(oAuth2User.getAttributes());
             case "kakao" -> new KakaoUserInfo(oAuth2User.getAttributes());
             default -> throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다.");
@@ -39,7 +39,7 @@ public class CustomAuthUserService extends DefaultOAuth2UserService {
         return new CustomUserDetails(user, oAuth2User.getAttributes());
     }
 
-    private User saveOrUpdate(AuthUserInfo userInfo) { 
+    private User saveOrUpdate(OAuth2UserInfo userInfo) { 
         return userRepository.findByEmailAndProvider(userInfo.getEmail(), userInfo.getProvider())
                 .map(user -> user)
                 .orElseGet(() -> userRepository.save(User.builder()

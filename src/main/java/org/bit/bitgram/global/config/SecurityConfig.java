@@ -48,8 +48,10 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/index.html", "/").permitAll() 
-                .anyRequest().authenticated() 
+            	.requestMatchers("/api/auth/me").authenticated()
+            	.requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/reissue").permitAll() 
+            	.requestMatchers("/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/", "/index.html").permitAll()
+            	.anyRequest().authenticated() 
             )
             
             .oauth2Login(oauth2 -> oauth2

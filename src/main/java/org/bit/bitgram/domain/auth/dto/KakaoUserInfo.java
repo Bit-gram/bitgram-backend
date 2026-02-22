@@ -2,7 +2,7 @@ package org.bit.bitgram.domain.auth.dto;
 import org.bit.bitgram.domain.user.entity.AuthProvider;
 import java.util.Map;
 
-public record KakaoUserInfo(Map<String, Object> attributes) implements AuthUserInfo {
+public record KakaoUserInfo(Map<String, Object> attributes) implements OAuth2UserInfo {
     @Override public String getProviderId() { return String.valueOf(attributes.get("id")); }
     @Override public AuthProvider getProvider() { return AuthProvider.KAKAO; }
     @Override public String getEmail() { 
