@@ -37,8 +37,7 @@ public class User extends ModifiedTimeEntity {
 
     private String providerId;
     
-    public User update(String nickname, String profileImageUrl) {
-        this.nickname = nickname;
+    public User update(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
         return this;
     }
