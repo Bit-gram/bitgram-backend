@@ -35,5 +35,12 @@ public class User extends ModifiedTimeEntity {
     @Column(nullable = false)
     private AuthProvider provider;
 
-    private String providerId; 
+    private String providerId;
+    
+    public User update(String nickname, String profileImageUrl) {
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        return this;
+    }
 }
+
