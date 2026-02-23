@@ -43,11 +43,7 @@ public class CustomAuthUserService extends DefaultOAuth2UserService {
 
     private User saveOrUpdate(OAuth2UserInfo userInfo) { 
         return userRepository.findByEmail(userInfo.getEmail())
-                .map(user -> user.update(
-                		userInfo.getProfileImageUrl(),
-                		userInfo.getProvider(),
-                		userInfo.getProviderId()
-                		)) 
+                .map(user -> user.update(userInfo.getProfileImageUrl())) 
                 .orElseGet(() -> {
                     String nickname = generateUniqueNickname(userInfo.getNickname());
                     return userRepository.save(createUserEntity(userInfo, nickname));
@@ -55,9 +51,15 @@ public class CustomAuthUserService extends DefaultOAuth2UserService {
     }
     
     private String generateUniqueNickname(String baseNickname) {
-        String nickname = baseNickname;
-        if (userRepository.existsByNickname(nickname)) {
-            nickname = baseNickname + "_" + UUID.randomUUID().toString().substring(0, 6);
+    	if (baseNickname == null || baseNickname.isBlank()) {
+            return "user_" + UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        }
+    	
+    	String nickname = baseNickname;
+    	if (userRepository.existsByNickname(nickname)) {
+            do {
+                nickname = baseNickname + "_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            } while (userRepository.existsByNickname(nickname)); 
         }
         return nickname;
     }
