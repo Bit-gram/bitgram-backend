@@ -1,6 +1,8 @@
 package org.bit.bitgram.global.security.auth;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
 import org.bit.bitgram.domain.auth.dto.GoogleUserInfo; 
 import org.bit.bitgram.domain.auth.dto.KakaoUserInfo;
 import org.bit.bitgram.domain.auth.dto.OAuth2UserInfo;
@@ -8,7 +10,6 @@ import org.bit.bitgram.domain.user.entity.User;
 import org.bit.bitgram.domain.user.entity.Role;
 import org.bit.bitgram.domain.user.repository.UserRepository;
 import org.bit.bitgram.global.security.user.CustomUserDetails;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -42,16 +43,23 @@ public class CustomAuthUserService extends DefaultOAuth2UserService {
 
     private User saveOrUpdate(OAuth2UserInfo userInfo) { 
         return userRepository.findByEmail(userInfo.getEmail())
-                .map(user -> user.update(userInfo.getProfileImageUrl())) 
+                .map(user -> user.update(
+                		userInfo.getProfileImageUrl(),
+                		userInfo.getProvider(),
+                		userInfo.getProviderId()
+                		)) 
                 .orElseGet(() -> {
                     String nickname = generateUniqueNickname(userInfo.getNickname());
-                    try {
-                        return userRepository.save(createUserEntity(userInfo, nickname));
-                    } catch (DataIntegrityViolationException e) {
-                        String retryNickname = generateUniqueNickname(userInfo.getNickname() + "_retry");
-                        return userRepository.save(createUserEntity(userInfo, retryNickname));
-                    }
+                    return userRepository.save(createUserEntity(userInfo, nickname));
                 });
+    }
+    
+    private String generateUniqueNickname(String baseNickname) {
+        String nickname = baseNickname;
+        if (userRepository.existsByNickname(nickname)) {
+            nickname = baseNickname + "_" + UUID.randomUUID().toString().substring(0, 6);
+        }
+        return nickname;
     }
     
     private User createUserEntity(OAuth2UserInfo userInfo, String nickname) {
@@ -63,15 +71,5 @@ public class CustomAuthUserService extends DefaultOAuth2UserService {
                 .provider(userInfo.getProvider())
                 .providerId(userInfo.getProviderId())
                 .build();
-    }
-    
-    private String generateUniqueNickname(String baseNickname) {
-        String nickname = baseNickname;
-        int suffix = 1;
-        
-        while (userRepository.existsByNickname(nickname)) {
-            nickname = baseNickname + suffix++;
-        }
-        return nickname;
     }
 }

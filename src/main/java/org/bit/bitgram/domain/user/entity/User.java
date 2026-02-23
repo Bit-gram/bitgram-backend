@@ -37,8 +37,10 @@ public class User extends ModifiedTimeEntity {
 
     private String providerId;
     
-    public User update(String profileImageUrl) {
+    public User update(String profileImageUrl, AuthProvider provider, String providerId) {
         this.profileImageUrl = profileImageUrl;
+        this.provider = provider;
+        this.providerId = providerId;
         return this;
     }
 }
