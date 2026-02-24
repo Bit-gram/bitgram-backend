@@ -50,6 +50,14 @@ public class Post extends ModifiedTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> images = new ArrayList<>();
 
+    /**
+     * Creates a Post entity with the given owner, content, location, and status.
+     *
+     * @param userId       the identifier of the user who created the post
+     * @param content      the textual content of the post
+     * @param locationName the human-readable location name associated with the post, or null if unspecified
+     * @param status       the visibility/status of the post; if null, defaults to {@code PostStatus.PUBLIC}
+     */
     @Builder
     public Post(Long userId, String content, String locationName, PostStatus status) {
         this.userId = userId;
@@ -60,18 +68,34 @@ public class Post extends ModifiedTimeEntity {
         this.commentCount = 0L;
     }
 
-    // 비즈니스 로직
+    /**
+     * Updates the post's content, location name, and visibility status.
+     *
+     * @param content      the new text content for the post
+     * @param locationName the new display name of the post's location (may be null)
+     * @param status       the new post status (e.g., PUBLIC, PRIVATE, DELETED); if null the status will be set accordingly by caller
+     */
     public  void update(String content, String locationName, PostStatus status) {
         this.content = content;
         this.locationName = locationName;
         this.status = status;
     }
 
+    /**
+     * Mark the post as deleted.
+     *
+     * Sets the post's status to {@code PostStatus.DELETED} and records the current time in {@code deletedAt}.
+     */
     public void softDelete() {
         this.status = PostStatus.DELETED;
         this.deletedAt = LocalDateTime.now();
     }
 
+    /**
+     * Adds the given image to this post's images collection.
+     *
+     * @param image the PostImage to add to the post
+     */
     public void addImage(PostImage image) {
         this.images.add(image);
     }
