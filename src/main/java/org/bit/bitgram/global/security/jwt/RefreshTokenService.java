@@ -19,7 +19,12 @@ public class RefreshTokenService {
     }
 
     public boolean validateRefreshToken(String email, String refreshToken) {
+    	if (refreshToken == null) {
+            return false;
+        }
+        
         String savedToken = redisTemplate.opsForValue().get("RT:" + email);
+        
         return refreshToken.equals(savedToken);
     }
     

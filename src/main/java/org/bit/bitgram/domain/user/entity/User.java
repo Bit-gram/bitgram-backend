@@ -31,7 +31,15 @@ public class User extends ModifiedTimeEntity {
     @Column(nullable = false)
     private Role role;
 
-    // 소셜 로그인 관련
-    private String provider;   // google, kakao, naver 등
-    private String providerId; // 소셜 서비스에서의 고유 식별값
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuthProvider provider;
+
+    private String providerId;
+    
+    public User update(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+        return this;
+    }
 }
+

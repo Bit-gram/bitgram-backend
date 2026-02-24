@@ -3,6 +3,8 @@ package org.bit.bitgram.global.config;
 import lombok.RequiredArgsConstructor;
 import org.bit.bitgram.global.security.jwt.JwtFilter;
 import org.bit.bitgram.global.security.jwt.TokenProvider;
+import org.bit.bitgram.global.security.auth.CustomAuthUserService;
+import org.bit.bitgram.global.security.auth.OAuth2SuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
+    private final CustomAuthUserService customAuthUserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -44,9 +48,18 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/index.html", "/").permitAll() // 로그인/회원가입은 허용
-                .anyRequest().authenticated() 
+            	.requestMatchers("/api/auth/me").authenticated()
+            	.requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/reissue").permitAll() 
+            	.requestMatchers("/login/oauth2/**", "/swagger-ui/**", "/v3/api-docs/**", "/", "/index.html").permitAll()
+            	.anyRequest().authenticated() 
             )
+            
+            .oauth2Login(oauth2 -> oauth2
+                    .userInfoEndpoint(userInfo -> userInfo
+                        .userService(customAuthUserService) 
+                    )
+                    .successHandler(oAuth2SuccessHandler)
+                )
 
             .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
