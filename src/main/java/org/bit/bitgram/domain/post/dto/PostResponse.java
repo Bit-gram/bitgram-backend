@@ -3,6 +3,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.bit.bitgram.domain.post.entity.Post;
 import org.bit.bitgram.domain.post.entity.PostImage;
+import org.bit.bitgram.domain.post.entity.PostStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ public class PostResponse {
     private List<String> imageUrls;
 //    private Long likeCount;
 //    private Long commentCount;
+    private PostStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -30,6 +32,7 @@ public class PostResponse {
                 .imageUrls(post.getImages().stream()
                     .map(PostImage::getImageUrl)
                     .collect(Collectors.toList()))
+                .status(post.getStatus())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

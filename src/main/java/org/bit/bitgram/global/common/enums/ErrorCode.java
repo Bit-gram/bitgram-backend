@@ -35,7 +35,12 @@ public enum ErrorCode {
     SAME_AS_OLD_PASSWORD(HttpStatus.BAD_REQUEST, "U005", "기존 비밀번호와 동일한 비밀번호입니다."),
     LOGIN_PROVIDER_MISMATCH(HttpStatus.UNAUTHORIZED, "U006", "올바르지 않은 로그인 방식입니다."),
     USER_STATUS_NOT_ACTIVE(HttpStatus.FORBIDDEN, "U007", "현재 계정 상태에서는 로그인할 수 없습니다."),
-    PERMISSION_FORBIDDEN(HttpStatus.FORBIDDEN, "U008", "작업 권한이 없습니다.");
+    PERMISSION_FORBIDDEN(HttpStatus.FORBIDDEN, "U008", "작업 권한이 없습니다."),
+
+    // 게시물
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "P001", "해당 게시물을 찾을 수 없습니다."),
+    POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "P002", "이미 삭제된 게시물입니다."),
+    POST_FORBIDDEN(HttpStatus.FORBIDDEN, "P003", "해당 게시물에 대한 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String code;

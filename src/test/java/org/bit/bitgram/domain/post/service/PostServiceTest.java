@@ -67,7 +67,7 @@ class PostServiceTest {
         when(postRepository.save(any(Post.class))).thenReturn(savedPost);
 
         // 2. When (실행)
-        Long resultId = postService.create(request, images);
+        Long resultId = postService.create(request, images, 1L);
 
         // 3. Then (검증) - 여기가 핵심! (White-box Test)
         assertThat(resultId).isEqualTo(1L);
@@ -178,7 +178,7 @@ class PostServiceTest {
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
 
         // When
-        postService.update(1L, request, newImages);
+        postService.update(1L, 1L, request, newImages);
 
         // Then
         // 내용이 잘 바뀌었는지 확인
@@ -204,7 +204,7 @@ class PostServiceTest {
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
 
         // When
-        postService.delete(1L);
+        postService.delete(1L, 1L);
 
         // Then
         // 상태가 DELETED 로 잘 바뀌었는지 확인

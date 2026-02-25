@@ -9,12 +9,14 @@ import org.bit.bitgram.domain.post.dto.PostResponse;
 import org.bit.bitgram.domain.post.dto.PostUpdateRequest;
 import org.bit.bitgram.domain.post.service.PostService;
 import org.bit.bitgram.global.common.ApiResponse;
+import org.bit.bitgram.global.security.user.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,12 +34,13 @@ public class PostController {
     @Operation(summary = "게시물 생성", description = "이미지와 내용을 업로드하여 게시물을 만듭니다.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Long>> createPost(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart(value = "data") PostCreateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     )   {
-        log.info("게시물 생성 요청 - 내용: {}, 위치: {}", request.getContent(), request.getLocationName());
+        log.info("게시물 생성 요청 - 사용자ID: {}, 위치: {}", userDetails.getUser().getUserId(), request.getLocationName());
 
-        Long postId = postService.create(request, images);
+        Long postId = postService.create(request, images, userDetails.getUser().getUserId());
         return ResponseEntity.ok(ApiResponse.success(postId));
     }
 
@@ -65,17 +68,21 @@ public class PostController {
     @PatchMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Long>> updatePost(
             @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart(value = "data")PostUpdateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        Long updatedPostId = postService.update(postId, request, images);
+        Long updatedPostId = postService.update(postId, userDetails.getUser().getUserId(), request, images);
         return ResponseEntity.ok(ApiResponse.success(updatedPostId));
     }
 
     @Operation(summary = "게시물 삭제", description = "게시물을 삭제 처리(Soft Delete) 합니다.")
     @DeleteMapping("/{postId}")
-    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId) {
-        postService.delete(postId);
+    public ResponseEntity<ApiResponse<Void>> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        postService.delete(postId, userDetails.getUser().getUserId());
         return ResponseEntity.ok(ApiResponse.success());
     }
 }
