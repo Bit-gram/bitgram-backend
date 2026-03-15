@@ -63,7 +63,7 @@ class PostServiceTest {
 
         // repository.save()가 호출되면, 임의의 Post 객체(ID=1)를 리턴하라고 가짜 행동 정의
         Post savedPost = Post.builder().userId(1L).build();
-        ReflectionTestUtils.setField(savedPost, "id", 1L); // ID 강제 주입
+        ReflectionTestUtils.setField(savedPost, "postId", 1L); // ID 강제 주입
         when(postRepository.save(any(Post.class))).thenReturn(savedPost);
 
         // 2. When (실행)
@@ -101,7 +101,7 @@ class PostServiceTest {
     void getPost_Success() {
         // Given
         Post post = Post.builder().userId(1L).content("조회 테스트").status(PostStatus.PUBLIC).build();
-        ReflectionTestUtils.setField(post, "id", 100L);
+        ReflectionTestUtils.setField(post, "postId", 100L);
         // 테스트용 이미지 추가
         post.addImage(PostImage.builder().imageUrl("http://test.com/img.jpg").build());
 
@@ -160,7 +160,7 @@ class PostServiceTest {
         // Given
         // 1. 기존 게시물 (이미지 1장 있음)
         Post post = Post.builder().content("수정 전 내용").status(PostStatus.PUBLIC).build();
-        ReflectionTestUtils.setField(post, "id", 1L);
+        ReflectionTestUtils.setField(post, "postId", 1L);
         post.addImage(PostImage.builder().imageUrl("old-image.jpg").build());
 
         // 2. 수정 요청 데이터 (내용 바꿈)
