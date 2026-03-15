@@ -15,7 +15,7 @@ public class PostImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
-    private Long id;
+    private Long imageId;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;

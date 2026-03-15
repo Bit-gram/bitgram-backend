@@ -59,7 +59,7 @@ public class ExploreService {
             int shortage = POST_LIMIT - candidates.size();
 
             // 중복 방지를 위해 이미 추천 목록에 들어간 게시글 ID 목록 추출
-            List<Long> excludePostIds = candidates.stream().map(Post::getId).toList();
+            List<Long> excludePostIds = candidates.stream().map(Post::getPostId).toList();
 
             List<Post> backfillPosts;
             // 제외할 ID가 없는 경우 SQL 문법 에러 발생
@@ -105,7 +105,7 @@ public class ExploreService {
     private List<Long> getLikedPostIds(Long userId) {
         return postLikeRepository
                 .findPostLikesByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(like -> like.getPost().getId())
+                .map(like -> like.getPost().getPostId())
                 .toList();
     }
 

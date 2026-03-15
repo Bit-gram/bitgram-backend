@@ -12,7 +12,7 @@ import java.util.List;
 public interface PostHashtagRepository extends JpaRepository<PostHashtag, Long> {
 
     // 게시글 id 목록에 해당하는 게시글-해시태그 매핑 정보를 한 번에 조회
-    @Query("SELECT ph FROM PostHashtag ph JOIN FETCH ph.hashtag WHERE ph.post.id IN :postIds")
+    @Query("SELECT ph FROM PostHashtag ph JOIN FETCH ph.hashtag WHERE ph.post.postId IN :postIds")
     List<PostHashtag> findByPostIdIn(@Param("postIds") List<Long> postIds);
 
     // 해시태그 기반으로 후보 게시글(중복 제외, 내 글 제외) 조회
@@ -20,8 +20,8 @@ public interface PostHashtagRepository extends JpaRepository<PostHashtag, Long> 
     @Query("SELECT DISTINCT ph.post FROM PostHashtag ph " +
             "WHERE ph.hashtag.name IN :hashtags " +
             "AND ph.post.userId <> :userId " +
-            "AND (:cursorId IS NULL OR :cursorId > ph.post.id) " +
-            "ORDER BY ph.post.id DESC") // 최신순 정렬
+            "AND (:cursorId IS NULL OR :cursorId > ph.post.postId) " +
+            "ORDER BY ph.post.postId DESC") // 최신순 정렬
     List<Post> findExploreCandidates(
             @Param("userId") Long userId,
             @Param("hashtags") List<String> hashtags,

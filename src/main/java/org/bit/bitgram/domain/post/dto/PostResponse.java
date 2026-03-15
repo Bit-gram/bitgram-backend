@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 public class PostResponse {
-    private Long id;
+    private Long postId;
     private Long userId;
     private String content;
     private String locationName;
@@ -23,7 +23,7 @@ public class PostResponse {
 
     public static PostResponse from(Post post) {
         return PostResponse.builder()
-                .id(post.getId())
+                .postId(post.getPostId())
                 .userId(post.getUserId())
                 .content(post.getContent())
                 .locationName(post.getLocationName())

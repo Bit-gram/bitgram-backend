@@ -18,9 +18,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p " +
             "WHERE p.userId <> :userId " +
             "AND (:cursorLikeCount IS NULL OR " +
-            "   (p.likeCount < :cursorLikeCount OR (p.likeCount = :cursorLikeCount AND p.id < :cursorId))" +
+            "   (p.likeCount < :cursorLikeCount OR (p.likeCount = :cursorLikeCount AND p.postId < :cursorId))" +
             ") " +
-            "ORDER BY p.likeCount DESC, p.id DESC")
+            "ORDER BY p.likeCount DESC, p.postId DESC")
     List<Post> findExploreFallback(
             @Param("userId") Long userId,
             @Param("cursorLikeCount") Long cursorLikeCount,
@@ -33,9 +33,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE p.userId <> :userId " +
             "AND p.id NOT IN :excludeIds " +
             "AND (:cursorLikeCount IS NULL OR " +
-            "   (p.likeCount < :cursorLikeCount OR (p.likeCount = :cursorLikeCount AND p.id < :cursorId))" +
+            "   (p.likeCount < :cursorLikeCount OR (p.likeCount = :cursorLikeCount AND p.postId < :cursorId))" +
             ") " +
-            "ORDER BY p.likeCount DESC, p.id DESC")
+            "ORDER BY p.likeCount DESC, p.postId DESC")
     List<Post> findExploreBackfill(
             @Param("userId") Long userId,
             @Param("excludeIds") List<Long> excludeIds,
