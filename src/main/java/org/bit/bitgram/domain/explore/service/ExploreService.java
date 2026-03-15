@@ -104,7 +104,7 @@ public class ExploreService {
     // 사용자가 누른 좋아요 기록에서 게시글 ID만 추출하기
     private List<Long> getLikedPostIds(Long userId) {
         return postLikeRepository
-                .findPostLikesByUserIdOrderByCreatedAtDesc(userId).stream()
+                .findPostLikesByUser_UserIdOrderByCreatedAtDesc(userId).stream()
                 .map(like -> like.getPost().getPostId())
                 .toList();
     }

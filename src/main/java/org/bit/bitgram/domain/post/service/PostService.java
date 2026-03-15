@@ -40,7 +40,7 @@ public class PostService {
         }
 
         // DB 저장
-        return postRepository.save(post).getId();
+        return postRepository.save(post).getPostId();
     }
 
     // 단건 조회
@@ -71,7 +71,7 @@ public class PostService {
 
             savePostImage(images, post);
         }
-        return post.getId();
+        return post.getPostId();
     }
 
     // 게시물 삭제 (Soft Delete)

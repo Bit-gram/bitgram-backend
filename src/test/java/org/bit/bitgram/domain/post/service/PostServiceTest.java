@@ -112,7 +112,7 @@ class PostServiceTest {
         PostResponse response = postService.getPost(100L);
 
         // Then
-        assertThat(response.getId()).isEqualTo(100L);
+        assertThat(response.getPostId()).isEqualTo(100L);
         assertThat(response.getContent()).isEqualTo("조회 테스트");
         assertThat(response.getImageUrls()).hasSize(1);
         assertThat(response.getImageUrls().get(0)).isEqualTo("http://test.com/img.jpg");

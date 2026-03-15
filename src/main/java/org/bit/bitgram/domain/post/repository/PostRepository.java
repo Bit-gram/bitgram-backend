@@ -31,7 +31,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // +) 인기순, 최신순 정렬 && 좋아요가 커서보다 작거나, 좋아요가 커서와 같으면서 ID가 커서보다 작은 게시글
     @Query("SELECT p FROM Post p " +
             "WHERE p.userId <> :userId " +
-            "AND p.id NOT IN :excludeIds " +
+            "AND p.postId NOT IN :excludeIds " +
             "AND (:cursorLikeCount IS NULL OR " +
             "   (p.likeCount < :cursorLikeCount OR (p.likeCount = :cursorLikeCount AND p.postId < :cursorId))" +
             ") " +
