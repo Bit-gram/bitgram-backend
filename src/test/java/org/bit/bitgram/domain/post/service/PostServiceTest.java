@@ -199,7 +199,7 @@ class PostServiceTest {
     void deletePost_Success() {
         // Given
         Post post = Post.builder().content("삭제될 글").status(PostStatus.PUBLIC).build();
-        ReflectionTestUtils.setField(post, "id", 1L);
+        ReflectionTestUtils.setField(post, "postId", 1L);
 
         when(postRepository.findById(1L)).thenReturn(Optional.of(post));
 
